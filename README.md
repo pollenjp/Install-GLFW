@@ -1,13 +1,17 @@
 # install-GLFW
 
-
 - [How to install](#how-to-install)
     - [build example](#build-example)
     - [check version](#check-version)
 - [undefined reference to](#undefined-reference-to)
 
+---
+
 
 ## How to install
+
+---
+
 
 ### build example
 
@@ -15,6 +19,9 @@
 $ make GLFW_VERSION=3.1.2
 $ make GLFW_VERSION=3.2.1
 ```
+
+---
+
 
 ### check version
 
@@ -408,4 +415,6 @@ collect2: error: ld returned 1 exit status
 Makefile:21: ターゲット 'check_version' のレシピで失敗しました
 make: *** [check_version] エラー
 ```
+
+---
 
