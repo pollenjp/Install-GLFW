@@ -14,8 +14,8 @@ TARGET := main
 #===============================================================================
 PKG_CONFIG_PATH := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/lib/pkgconfig
 #=======================================
-# v3.2.1
-ifeq (${GLFW_VERSION}, 3.2.1)
+# v3.*
+ifneq ($(shell echo ${GLFW_VERSION} | grep -E "3\.[0-9]+\.[0-9]+"), )
 INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags glfw3`
 # Select `static` or 'shared' OPENCV LIB 
 # --static : static library (.a)
@@ -30,8 +30,8 @@ endif
 #=======================================
 # Others
 else
-#ERROR_MESSAGE := 'GLFW_VERSION' variable should be 'static' or 'shared'.
-#$(error "${ERROR_MESSAGE}")
+ERROR_MESSAGE := 'GLFW_VERSION' variable (${GLFW_VERSION}) is not supported.
+$(error "${ERROR_MESSAGE}")
 endif
 
 #===============================================================================

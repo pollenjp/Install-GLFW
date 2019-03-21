@@ -1,13 +1,13 @@
 # install-GLFW
 
 
-- [使用例](#使用例)
+- [How to install](#how-to-install)
     - [build example](#build-example)
     - [check version](#check-version)
 - [undefined reference to](#undefined-reference-to)
 
 
-## 使用例
+## How to install
 
 ### build example
 
@@ -19,18 +19,19 @@ $ make GLFW_VERSION=3.2.1
 ### check version
 
 ```
- % make check_version GLFW_VERSION=3.1.2
-g++ -g -Wall -std=c++11    check_version.cpp -I/home/pollenjp/.glfw/install/GLFW-3.1.2/include -L/home/pollenjp/.glfw/install/GLFW-3.1.2/lib -lglfw3 -ldl -lX11 -lXxf86vm -lXinerama -lXrandr -lXcursor -lXi -lpthread -o check_version
- % ./check_version 
-GLFW version     : 3.1.2 X11 GLX clock_gettime /dev/js XI Xf86vm
-Major version    : 3
-Minor version    : 1
-Subminor version : 2
- % make clean         
-rm -f check_version check_version.o *~ .*~ core
- % make check_version GLFW_VERSION=3.2.1
-g++ -g -Wall -std=c++11    check_version.cpp -I/home/pollenjp/.glfw/install/GLFW-3.2.1/include -L/home/pollenjp/.glfw/install/GLFW-3.2.1/lib -lglfw3 -ldl -lX11 -lXxf86vm -lXinerama -lXrandr -lXcursor -lXi -lpthread -o check_version
- % ./check_version 
+ % make GLFW_VERSION=3.2.1 GLFW_LIB=static
+make main
+make[1]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' に入ります
+make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' に入ります
+make[2]: 'preprocess' に対して行うべき事はありません.
+make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' から出ます
+g++ -g -Wall -std=c++11  check_version.cpp  `PKG_CONFIG_PATH=/home/pollenjp/.glfw/install/GLFW-3.2.1/lib/pkgconfig pkg-config --cflags glfw3`  `PKG_CONFIG_PATH=/home/pollenjp/.glfw/install/GLFW-3.2.1/lib/pkgconfig pkg-config --static --libs glfw3` -c -o check_version.o
+make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' に入ります
+make[2]: 'preprocess' に対して行うべき事はありません.
+make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' から出ます
+g++ -g -Wall -std=c++11     check_version.o  `PKG_CONFIG_PATH=/home/pollenjp/.glfw/install/GLFW-3.2.1/lib/pkgconfig pkg-config --static --libs glfw3` -o main
+make[1]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' から出ます
+./main
 GLFW version     : 3.2.1 X11 GLX EGL clock_gettime /dev/js Xf86vm
 Major version    : 3
 Minor version    : 2
