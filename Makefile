@@ -1,24 +1,53 @@
 SHELL := /bin/bash
 
+#===============================================================================
 GLFW_VERSION := 3.2.1
-ERROR_MESSAGE :=
-
-CXX := g++
-CXXFLAGS = -g -Wall -std=c++11
-INC := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/include
-INC := $(addprefix -I,${INC})
-LDLIBS1 := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/lib
-LDLIBS2 := glfw3 dl X11 Xxf86vm Xinerama Xrandr Xcursor Xi pthread
-LDLIBS  := $(addprefix -L,${LDLIBS1}) $(addprefix -l,${LDLIBS2})
-LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
-
-OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-TARGET := check_version
-export
-
-.DEFAULT_GOAL := run
+# "static" or "shared"
+GLFW_LIB := static
 
 #===============================================================================
+INC :=
+LDLIBS  :=
+OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+TARGET := main
+
+#===============================================================================
+PKG_CONFIG_PATH := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/lib/pkgconfig
+#=======================================
+# v3.2.1
+ifeq (${GLFW_VERSION}, 3.2.1)
+INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags glfw3`
+# Select `static` or 'shared' OPENCV LIB 
+# --static : static library (.a)
+ifeq (${GLFW_LIB}, shared)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs glfw3`
+else ifeq (${GLFW_LIB}, static)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs glfw3`
+else
+ERROR_MESSAGE := 'GLFW_LIB' variable should be 'static' or 'shared'.
+$(error "${ERROR_MESSAGE}")
+endif
+#=======================================
+# Others
+else
+#ERROR_MESSAGE := 'GLFW_VERSION' variable should be 'static' or 'shared'.
+#$(error "${ERROR_MESSAGE}")
+endif
+
+#===============================================================================
+CXX := g++
+CXXFLAGS = -g -Wall -std=c++11
+LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
+export
+
+#===============================================================================
+.DEFAULT_GOAL := run
+
+.PHONY : debug
+debug:
+	echo ${INC}
+	echo ${LDLIBS}
+
 .PHONY : run
 run :  # 要件チェック
 	${MAKE} ${TARGET}
@@ -36,14 +65,12 @@ endif
 error :  ## errors処理を外部に記述することで好きなエラーメッセージをprintfで記述可能.
 	$(error "${ERROR_MESSAGE}")
 
-
 #===============================================================================
-${TARGET} : ${OBJECTS}
-
 %.o : %.cpp
 	@$(MAKE) preprocess
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ ${INC} ${LDLIBS} -c -o $@
-% : %.o
+
+${TARGET} : ${OBJECTS}
 	@$(MAKE) preprocess
 	$(LINK.cc) $(TARGET_ARCH) $^ ${LDLIBS} -o $@
 
@@ -51,7 +78,6 @@ ${TARGET} : ${OBJECTS}
 .PHONY : clean
 clean :
 	-${RM} ${TARGET} ${OBJECTS} *~ .*~ core
-
 
 #===============================================================================
 .PHONY : install-glfw
