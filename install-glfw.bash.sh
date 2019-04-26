@@ -1,7 +1,22 @@
 #!/bin/bash -eux
+
+# [bash - What's a concise way to check that environment variables are set in a Unix shell script? - Stack Overflow](https://stackoverflow.com/a/307735/9316234)
 #GLFW_VERSION=3.2.1
+: "${GLFW_VERSION:?Need to be set. (ex: '$ GLFW_VERSION=3.2.1 ./xxx.sh')}"
+# 'shared' or 'static'
+: "${GLFW_LIBS:?Need to be set. 'static' or 'shared' (ex: '$ GLFW_LIBS=static ./xxx.sh')}"
+
+if [ ${GLFW_LIBS} == "static" ]; then
+    BUILD_SHARED_LIBS=OFF
+elif [ ${GLFW_LIBS} == "shared" ]; then
+    BUILD_SHARED_LIBS=ON
+else
+    printf "\e[101m %s \e[0m \n" "Variable GLFW_LIBS should be 'static' or 'shared'."
+    exit 1
+fi
+
 GLFW_DIR="${HOME}/.glfw"
-CMAKE_INSTALL_PREFIX=${GLFW_DIR}/install/GLFW-${GLFW_VERSION}
+CMAKE_INSTALL_PREFIX=${GLFW_DIR}/install/GLFW-${GLFW_VERSION}/${GLFW_LIBS}
 # current working directory
 CWD=$(pwd)
 
@@ -30,30 +45,29 @@ if [ ! -d "${GLFW_DIR}/glfw" ]; then
 fi
 
 cd "${GLFW_DIR}/glfw"
+git checkout master
+git fetch
+git pull --all
 git checkout ${GLFW_VERSION}
 cd ..
  
 #=======================================
 # [Generating build files with CMake](https://www.glfw.org/docs/latest/compile.html#compile_generate)
 # [Shared CMake options](https://www.glfw.org/docs/latest/compile.html#compile_options_shared)
-cd "${GLFW_DIR}/glfw"
 directory1="${GLFW_DIR}/glfw/build"
 if [ -d "${directory1}" ]; then
   rm -rf ${directory1}
-  mkdir ${directory1}
 fi
-if [ ! -d "${directory1}" ] && [ ! -L "${directory1}" ]; then
-  mkdir ${directory1}
-fi
+mkdir ${directory1}
 cd ${directory1}
+
 cmake \
       -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
+      -D BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
       -D GLFW_BUILD_EXAMPLES=ON \
       -D GLFW_BUILD_TESTS=ON \
       -D GLFW_BUILD_DOCS=ON \
       ..
-      #-D BUILD_SHARED_LIBS=ON \
-      #-D BUILD_SHARED_LIBS=ON \
       #-D GLFW_VULKAN_STATIC=ON \
 make -j4
 if [ -d "${CMAKE_INSTALL_PREFIX}" ]; then

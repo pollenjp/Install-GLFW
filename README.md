@@ -10,6 +10,10 @@
 
 ## How to install
 
+```
+ % make install-glfw GLFW_VERSION=3.2.1 GLFW_LIBS=static  
+```
+
 ---
 
 
@@ -26,7 +30,7 @@ $ make GLFW_VERSION=3.2.1
 ### check version
 
 ```
- % make GLFW_VERSION=3.2.1 GLFW_LIB=static
+ % make GLFW_VERSION=3.2.1 GLFW_LIBS=static
 make main
 make[1]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' に入ります
 make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-GLFW' に入ります

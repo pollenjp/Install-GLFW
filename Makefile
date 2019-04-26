@@ -3,28 +3,40 @@ SHELL := /bin/bash
 #===============================================================================
 GLFW_VERSION := 3.2.1
 # "static" or "shared"
-GLFW_LIB := static
+GLFW_LIBS := static
 
-#===============================================================================
+CXX := g++
+CXXFLAGS = -g -Wall -std=c++11
+LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
+
 INC :=
 LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 TARGET := main
 
 #===============================================================================
-PKG_CONFIG_PATH := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/lib/pkgconfig
+#===============================================================================
+#===============================================================================
+ifneq (${GLFW_LIBS}, static)
+ifneq (${GLFW_LIBS}, shared)
+$(error "'GLFW_LIBS' variable should be set. ('static' or 'shared')")
+endif
+endif
+
+#===============================================================================
+PKG_CONFIG_PATH := ${HOME}/.glfw/install/GLFW-${GLFW_VERSION}/${GLFW_LIBS}/lib/pkgconfig
 #=======================================
 # v3.*
 ifneq ($(shell echo ${GLFW_VERSION} | grep -E "3\.[0-9]+\.[0-9]+"), )
 INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags glfw3`
 # Select `static` or 'shared' OPENCV LIB 
 # --static : static library (.a)
-ifeq (${GLFW_LIB}, shared)
+ifeq (${GLFW_LIBS}, shared)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs glfw3`
-else ifeq (${GLFW_LIB}, static)
+else ifeq (${GLFW_LIBS}, static)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs glfw3`
 else
-ERROR_MESSAGE := 'GLFW_LIB' variable should be 'static' or 'shared'.
+ERROR_MESSAGE := 'GLFW_LIBS' variable should be 'static' or 'shared'.
 $(error "${ERROR_MESSAGE}")
 endif
 #=======================================
@@ -33,11 +45,10 @@ else
 ERROR_MESSAGE := 'GLFW_VERSION' variable (${GLFW_VERSION}) is not supported.
 $(error "${ERROR_MESSAGE}")
 endif
-
 #===============================================================================
-CXX := g++
-CXXFLAGS = -g -Wall -std=c++11
-LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
+#===============================================================================
+#===============================================================================
+
 export
 
 #===============================================================================
@@ -83,6 +94,6 @@ clean :
 .PHONY : install-glfw
 install-glfw :
 	@$(MAKE) preprocess
-	GLFW_VERSION=${GLFW_VERSION} ./install-glfw.bash.sh
+	GLFW_VERSION=${GLFW_VERSION} GLFW_LIBS=${GLFW_LIBS} ./install-glfw.bash.sh
 
 
